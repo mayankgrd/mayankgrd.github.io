@@ -3,7 +3,9 @@
 from __future__ import unicode_literals
 
 AUTHOR = u'Mayank'
-SITENAME = u'Thoughts to action'
+ABOUT_ME = 'Just another passionate thinker.'
+
+SITENAME = u'Coded thoughts'
 SITEURL = ''
 
 PATH = 'content'
@@ -20,10 +22,9 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (('Pelican', 'http://getpelican.com/'),
-         ('Python.org', 'http://python.org/'),
-         ('Jinja2', 'http://jinja.pocoo.org/'),
-         ('You can modify those links in your config file', '#'),)
+LINKS = (('Rice homepage', 'http://www.ece.rice.edu/~mk28/'),
+         ('Scalable Health Initiative', 'http://sh.rice.edu/'),
+         ('Jinja2', 'http://jinja.pocoo.org/'))
 
 # Social widget
 SOCIAL = (('You can add links in your config file', '#'),
@@ -33,3 +34,9 @@ DEFAULT_PAGINATION = False
 
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
+
+THEME = 'theme/pelican-bootstrap3'
+SHOW_ARTICLE_AUTHOR = True 
+CUSTOM_CSS = 'static/custom.css'
+STATIC_PATHS = ['images', 'extra/custom.css']
+PYGMENTS_STYLE = 'monokai'
