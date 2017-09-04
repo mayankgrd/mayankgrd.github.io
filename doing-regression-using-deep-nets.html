@@ -110,17 +110,17 @@ Coded thoughts            </a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <h2>Introduction</h2>
-<p>Though, deep-nets have seen significant success for classification tasks, its use for regression is not that popular. In this article, I will explore some of the main architectural choices which are considered helpful for performing regression using deep-nets. Then, I will go over a sample code which implements a 3-layer network for performing a simple regression to determine housing prices given some input features. </p>
+<p>Deep-nets have seen significant success for classification tasks,  but its use for regression is not that obvious and is generally not discussed in tutorials. In this article, I will explore some of the main architectural choices which are considered helpful to build a deep-net to do regression. Obviously, the advantage of using deep-nets for regression is that we are no longer limited by linear relationships between features as is the case with linear regression or we don't have to use hand-crafted feature. At the end, I will provide a sample code which implements a 3-layer deep neural network for performing a simple regression to predict housing prices given some input features. </p>
 <h2>Classification vs regression</h2>
-<p>In classification tasks, the aim is to categorize an input <span class="math">\(x\)</span> into one of the m classes <span class="math">\(\{0,1, \cdots, m\}\)</span>. For simplicity we will assume here only a two-class classification problem, i.e. <span class="math">\(y \in \{0,1\}\)</span>. Therefore, the target or output can be considered as a Bernoulli random variable. A standard approach in deep-nets is to use a sigmoid unit at the output layer to model the posterior probability, i.e.  </p>
+<p>In classification tasks, the aim is to categorize an input <span class="math">\(x\)</span> into one of the m classes <span class="math">\(\{0,1, \cdots, m\}\)</span>. For simplicity we will assume  to have only a two-class classification problem, i.e. <span class="math">\(y \in \{0,1\}\)</span>. Therefore, the target or output can be considered as a Bernoulli random variable. A standard approach in deep-nets is to use a sigmoid unit at the output layer to model the posterior probability, i.e.  </p>
 <div class="math">\begin{equation}
 \hat{y} = p(y=1/x) =\sigma(W^Th+b)
 \end{equation}</div>
-<p>where <span class="math">\(h\)</span> is the output of the hidden layer and is a non-linear function of the input <span class="math">\(x\)</span>, i.e. <span class="math">\(h=f(x)\)</span>. The maximum likelihood approach to determine the parameters of this model assuming Bernoulli target leads to the cross-entropy loss function, i.e. </p>
+<p>where <span class="math">\(h\)</span> is the output of the hidden layer and is a non-linear function of the input <span class="math">\(x\)</span>, i.e. <span class="math">\(h=f_{net}(x)\)</span>. The maximum likelihood approach to determine the parameters of this model assuming Bernoulli target leads to the cross-entropy loss function, i.e. </p>
 <div class="math">\begin{equation}
 L(\hat{\mathbf{y}},\mathbf{y}) =  -\sum_{n=1}^{N}(y_n\log{\hat{y}_n} - (1-y_n)\log{1-\hat{y}_n})
 \end{equation}</div>
-<p>On the other hand, for regression tasks we simply consider the output of the last linear unit of the network to produce the mean of a conditional Gaussian distribution, i.e. 
+<p>On the other hand, for regression tasks one simply has to consider the output linear unit produce the mean of a conditional Gaussian distribution, i.e. 
 </p>
 <div class="math">\begin{equation}
 p(\mathbf{y}/\mathbf{x}) = \mathcal{N}(\mathbf{y};\hat{\mathbf{y}}, \mathbf{I})
