@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Doing regression using deep-nets - Coded thoughts</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="http://mayankgrd.github.io/doing-regression-using-deep-nets.html">
+
+        <meta name="author" content="Mayank Kumar" />
+        <meta name="keywords" content="regression" />
+        <meta name="description" content="Some thoughts on doing regression using deep nets" />
+
+        <meta property="og:site_name" content="Coded thoughts" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Doing regression using deep-nets"/>
+        <meta property="og:url" content="http://mayankgrd.github.io/doing-regression-using-deep-nets.html"/>
+        <meta property="og:description" content="Some thoughts on doing regression using deep nets"/>
+        <meta property="article:published_time" content="2017-09-03" />
+            <meta property="article:section" content="deep-learning" />
+            <meta property="article:tag" content="regression" />
+            <meta property="article:author" content="Mayank Kumar" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://mayankgrd.github.io/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="http://mayankgrd.github.io/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://mayankgrd.github.io/theme/css/pygments/colorful.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://mayankgrd.github.io/theme/css/style.css" type="text/css"/>
+        <link href="http://mayankgrd.github.io/static/custom.css" rel="stylesheet">
+
+        <link href="http://mayankgrd.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Coded thoughts ATOM Feed"/>
+
+
+
+        <link href="http://mayankgrd.github.io/feeds/deep-learning.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Coded thoughts deep-learning ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://mayankgrd.github.io/" class="navbar-brand">
+Coded thoughts            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a href="http://mayankgrd.github.io/category/deep-learning.html">Deep-learning</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://mayankgrd.github.io/doing-regression-using-deep-nets.html"
+                       rel="bookmark"
+                       title="Permalink to Doing regression using deep-nets">
+                        Doing regression using deep-nets
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2017-09-03T23:03:00+02:00"> Sun 03 September 2017</time>
+    </span>
+          <span class="label label-default">Modified</span>
+            <span class="modified">
+                <i class="fa fa-calendar"></i><time datetime="2017-09-03T23:03:00+02:00"> Sun 03 September 2017</time>
+            </span>
+
+
+            <span class="label label-default">By</span>
+            <a href="http://mayankgrd.github.io/author/mayank-kumar.html"><i class="fa fa-user"></i> Mayank Kumar</a>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://mayankgrd.github.io/tag/regression.html">regression</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <h2>Introduction</h2>
+<p>Though, deep-nets have seen significant success for classification tasks, its use for regression is not that popular. In this article, I will explore some of the main architectural choices which are considered helpful for performing regression using deep-nets. Then, I will go over a sample code which implements a 3-layer network for performing a simple regression to determine housing prices given some input features. </p>
+<h2>Classification vs regression</h2>
+<p>In classification tasks, the aim is to categorize an input <span class="math">\(x\)</span> into one of the m classes <span class="math">\(\{0,1, \cdots, m\}\)</span>. For simplicity we will assume here only a two-class classification problem, i.e. <span class="math">\(y \in \{0,1\}\)</span>. Therefore, the target or output can be considered as a Bernoulli random variable. A standard approach in deep-nets is to use a sigmoid unit at the output layer to model the posterior probability, i.e.  </p>
+<div class="math">\begin{equation}
+\hat{y} = p(y=1/x) =\sigma(W^Th+b)
+\end{equation}</div>
+<p>where <span class="math">\(h\)</span> is the output of the hidden layer and is a non-linear function of the input <span class="math">\(x\)</span>, i.e. <span class="math">\(h=f(x)\)</span>. The maximum likelihood approach to determine the parameters of this model assuming Bernoulli target leads to the cross-entropy loss function, i.e. </p>
+<div class="math">\begin{equation}
+L(\hat{\mathbf{y}},\mathbf{y}) =  -\sum_{n=1}^{N}(y_n\log{\hat{y}_n} - (1-y_n)\log{1-\hat{y}_n})
+\end{equation}</div>
+<p>On the other hand, for regression tasks we simply consider the output of the last linear unit of the network to produce the mean of a conditional Gaussian distribution, i.e. 
+</p>
+<div class="math">\begin{equation}
+p(\mathbf{y}/\mathbf{x}) = \mathcal{N}(\mathbf{y};\hat{\mathbf{y}}, \mathbf{I})
+\end{equation}</div>
+<p>
+where <span class="math">\(\hat{\mathbf{y}}\)</span> is the output of the linear unit and equals <span class="math">\((W^T\mathbf{h}+b)\)</span>. The maximum likelihood approach to determine the mean of this Gaussian distribution (variance is assumed to be 1) leads to the well known mean squared loss function, i.e. 
+</p>
+<div class="math">\begin{equation}
+L(\hat{\mathbf{y}},\mathbf{y}) = \sum_{n=1}^N(y_n-\hat{y}_n)^2
+\end{equation}</div>
+<p>Therefore, there are two clear differences which emerged for designing deep-nets to perform regression:</p>
+<ol>
+<li>We don't have to use a sigmoid non-linearity at the output layer. The output of the last linear unit equals the target <span class="math">\(\hat{\mathbf{y}}=(W^T\mathbf{h}+b)\)</span>. No change in the non-linearity of the hidden unit is required.  </li>
+<li>We have to use the mean squared loss function rather than the usual cross-entropy loss function. </li>
+</ol>
+<h2>A sample regression example using deep-nets</h2>
+<figure class='code'>
+<figcaption><span>TensorFlow implementation [Lines 9-98]</span> <a href='/code/deep-regression.py'>download</a></figcaption>
+
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span> 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span> 
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span> 
+
+<span class="kn">import</span> <span class="nn">pickle</span> 
+
+<span class="c1"># load data </span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data.pkl&#39;</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="n">P</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># number of featuress, size of input </span>
+<span class="n">n_h1</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">n_h2</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">num_output</span> <span class="o">=</span> <span class="mi">1</span> 
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">128</span> 
+
+<span class="k">if</span> <span class="n">y_train</span><span class="o">.</span><span class="n">ndim</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="k">if</span> <span class="n">y_test</span><span class="o">.</span><span class="n">ndim</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">y_test</span> <span class="o">=</span> <span class="n">y_test</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> 
+
+<span class="n">graph</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">graph</span><span class="o">.</span><span class="n">as_default</span><span class="p">():</span> 
+    
+    <span class="c1"># before non-linearity</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="n">P</span><span class="p">))</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># first layer</span>
+    <span class="n">weight_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">([</span><span class="n">P</span><span class="p">,</span> <span class="n">n_h1</span><span class="p">],</span><span class="mf">0.0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="n">P</span><span class="p">)))</span>
+    <span class="n">biases_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_h1</span><span class="p">]))</span>
+
+    <span class="c1"># second layer</span>
+    <span class="n">weight_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">([</span><span class="n">n_h1</span><span class="p">,</span><span class="n">n_h2</span><span class="p">],</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="n">n_h1</span><span class="p">)))</span>
+    <span class="n">biases_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_h2</span><span class="p">]))</span>
+
+    <span class="c1"># third layer </span>
+    <span class="n">weight_3</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">truncated_normal</span><span class="p">([</span><span class="n">n_h2</span><span class="p">,</span><span class="n">num_output</span><span class="p">],</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="n">n_h2</span><span class="p">)))</span>
+    <span class="n">biases_3</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_output</span><span class="p">]))</span>
+
+    <span class="c1"># Forward model .</span>
+    <span class="n">z_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">weight_1</span><span class="p">)</span> <span class="o">+</span> <span class="n">biases_1</span>
+    <span class="n">a_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">z_1</span><span class="p">)</span>
+    
+    <span class="n">z_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">a_1</span><span class="p">,</span><span class="n">weight_2</span><span class="p">)</span> <span class="o">+</span> <span class="n">biases_2</span>
+    <span class="n">a_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">z_2</span><span class="p">)</span>
+    
+    <span class="n">z_3</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">a_2</span><span class="p">,</span><span class="n">weight_3</span><span class="p">)</span> <span class="o">+</span> <span class="n">biases_3</span> 
+    <span class="n">a_3</span> <span class="o">=</span> <span class="n">z_3</span> <span class="c1"># no non-linearity </span>
+    
+    
+    <span class="n">prediction</span>  <span class="o">=</span> <span class="n">a_3</span>  <span class="c1"># regression</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_</span><span class="p">,</span><span class="n">prediction</span><span class="p">)</span> <span class="c1"># MSE loss for regression</span>
+    <span class="c1"># Optimizer.</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">GradientDescentOptimizer</span><span class="p">(</span><span class="mf">0.0025</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+   
+    
+<span class="k">def</span> <span class="nf">accuracy_rmse</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">y_hat</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">y_hat</span><span class="p">)))</span>
+
+<span class="n">num_steps</span><span class="o">=</span><span class="mi">50000</span>
+<span class="n">train_error</span> <span class="o">=</span> <span class="p">[]</span> 
+<span class="n">test_error</span> <span class="o">=</span> <span class="p">[]</span> 
+<span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+  <span class="n">tf</span><span class="o">.</span><span class="n">initialize_all_variables</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Initialized&quot;</span><span class="p">)</span>
+  <span class="n">train_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_</span><span class="p">:</span> <span class="n">y_train</span><span class="p">}</span> 
+  <span class="n">test_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_</span><span class="p">:</span> <span class="n">y_test</span><span class="p">}</span>
+  <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_steps</span><span class="p">):</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">step</span> <span class="o">*</span> <span class="n">batch_size</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">batch_size</span><span class="p">)</span>
+    <span class="n">X_batch</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">offset</span><span class="p">:(</span><span class="n">offset</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">),</span> <span class="p">:]</span>
+    <span class="n">y_batch</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[</span><span class="n">offset</span><span class="p">:(</span><span class="n">offset</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">),:]</span>
+    <span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span> <span class="p">:</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">y_</span> <span class="p">:</span> <span class="n">y_batch</span><span class="p">}</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span><span class="n">pred</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">prediction</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">feed_dict</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">step</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Minibatch loss at step </span><span class="si">%d</span><span class="s2">: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Minibatch accuracy: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">accuracy_rmse</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">step</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span> 
+        <span class="n">train_pred</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">train_dict</span><span class="p">)</span>
+        <span class="n">test_pred</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">test_dict</span><span class="p">)</span>
+        <span class="n">train_error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">accuracy_rmse</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">train_pred</span><span class="p">))</span>
+        <span class="n">test_error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">accuracy_rmse</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span><span class="n">test_pred</span><span class="p">))</span>
+        
+  <span class="n">train_pred</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">train_dict</span><span class="p">)</span>
+  <span class="n">test_pred</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="n">test_dict</span><span class="p">)</span>
+  
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Train error = </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">accuracy_rmse</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">train_pred</span><span class="p">))</span>
+  <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Test error = </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">accuracy_rmse</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span><span class="n">test_pred</span><span class="p">))</span>
+</pre></div>
+
+
+</figure>
+
+<p>Using this: we get 
+Train Error: <span class="math">\(0.08\)</span> and Test Error: <span class="math">\(0.18\)</span>. </p>
+<p>Comparatively, a Linear regression with Lasso (L1) regularization gives a test error of <span class="math">\(0.105\)</span> where it rejected around 210 features and only considered 110 features for the regression. Therefore, we could also use regularization in our deep-net to improve generalization performance. </p>
+<h2>Conclusion</h2>
+<p>Though, the above network did not perform better than a Lasso linear regression model, maybe be due to over-fitting as the above dataset only had <span class="math">\(1019\)</span> training examples. But, given sufficiently large dataset and using regularization, we can avoid over-fitting and perform regression using deep-nets. </p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<div id="aboutme">
+    <p>
+      <strong>About Mayank</strong><br/>
+        Just another passionate thinker
+    </p>
+</div><!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Social -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Social</span></h4>
+  <ul class="list-group" id="social">
+    <li class="list-group-item"><a href="http://twitter.com/ideas2ignite"><i class="fa fa-twitter-square fa-lg"></i> twitter</a></li>
+    <li class="list-group-item"><a href="https://www.linkedin.com/in/mayankgrd"><i class="fa fa-linkedin-square fa-lg"></i> linkedin</a></li>
+    <li class="list-group-item"><a href="http://github.com/mayankgrd"><i class="fa fa-github-square fa-lg"></i> github</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Social -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://www.ece.rice.edu/~mk28/" target="_blank">Homepage</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://sh.rice.edu/" target="_blank">Scalable Health Initiative</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2017 Mayank
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="http://mayankgrd.github.io/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://mayankgrd.github.io/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://mayankgrd.github.io/theme/js/respond.min.js"></script>
+
+
+
+</body>
+</html>
