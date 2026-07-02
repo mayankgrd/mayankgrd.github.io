@@ -9,15 +9,17 @@ Run the site locally with live reload.
 
 ## Steps
 
-1. From the repo root, start the dev server in the background (include drafts so
+1. Pick a port (default `1313`; if it's busy, use `1314`, etc.). Call it `PORT`.
+2. From the repo root, start the dev server in the background (include drafts so
    work-in-progress is visible):
-   `hugo server -D --port 1313`
-2. Wait ~2 seconds, then confirm it is up:
-   `curl -sSI http://localhost:1313/ | head -1` (expect `HTTP/1.1 200 OK`).
-3. Give the user the URL: http://localhost:1313/
-4. Tell them edits to markdown reload automatically, and to say "stop preview"
+   `hugo server -D --port PORT`
+3. Wait ~2 seconds, then confirm it is up on the **same** port you chose:
+   `curl -sSI http://localhost:PORT/ | head -1` (expect `HTTP/1.1 200 OK`).
+4. Give the user the URL: `http://localhost:PORT/`
+5. Tell them edits to markdown reload automatically, and to say "stop preview"
    to shut it down (kill the background `hugo server` process).
 
 ## Notes
-- If port 1313 is busy, retry on 1314 and report the new URL.
+- Always use the same `PORT` in the start command, the health check, and the URL
+  you report — don't hardcode 1313 in the check if you started on another port.
 - If `hugo` is missing, tell the user to run `brew install hugo`.
