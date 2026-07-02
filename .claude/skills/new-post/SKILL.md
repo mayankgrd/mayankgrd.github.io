@@ -20,11 +20,21 @@ Create a new article for the Hugo site.
    Congo only loads KaTeX on pages that use this shortcode; `$...$` / `$$...$$`
    alone will not render without it.
 6. Tell the user the file path and remind them they can now write markdown,
-   including code fences, `$...$` / `$$...$$` math (needs the katex shortcode
-   above), and ```mermaid diagrams (these work without any shortcode).
+   including code fences and `$...$` / `$$...$$` math (needs the katex shortcode
+   from step 5).
 7. Suggest running the `preview` skill to see it locally.
 
 ## Notes
 - Bundle format is `content/posts/<slug>/index.md` so images can sit alongside
   the post in the same folder.
 - Do not set `draft: true` unless the user asks — drafts are not published.
+- **Diagrams:** use Congo's Mermaid *shortcode*, not a ```` ```mermaid ```` code
+  fence. A code fence renders as raw text — Congo only loads the Mermaid library
+  when the page uses the shortcode:
+
+  ```
+  {{< mermaid >}}
+  graph LR
+      A[Start] --> B[End]
+  {{< /mermaid >}}
+  ```

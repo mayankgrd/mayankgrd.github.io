@@ -23,12 +23,12 @@ Inline math like $e^{i\pi} + 1 = 0$ works too.
 
 ## Diagram
 
-```mermaid
+{{< mermaid >}}
 graph LR
     A[Write markdown] --> B[Preview locally]
     B --> C[Publish]
     C --> D[Live on GitHub Pages]
-```
+{{< /mermaid >}}
 
 ## Code
 

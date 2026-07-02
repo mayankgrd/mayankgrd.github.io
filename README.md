@@ -32,7 +32,8 @@ body:
 
 - **Math:** `$inline$` and `$$display$$` (KaTeX) — add a `{{< katex >}}`
   shortcode near the top of any post that uses math, or it won't render
-- **Diagrams:** ```` ```mermaid ```` fenced blocks
+- **Diagrams:** wrap Mermaid in the `{{< mermaid >}}` … `{{< /mermaid >}}`
+  shortcode (a plain ```` ```mermaid ```` fence renders as raw text)
 - **Code:** fenced blocks with syntax highlighting
 
 ## Repo layout
