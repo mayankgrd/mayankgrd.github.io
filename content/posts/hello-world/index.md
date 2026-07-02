@@ -9,6 +9,8 @@ math: true
 Welcome to the rebuilt site. This post exists to demonstrate that math,
 diagrams, and code all render correctly.
 
+{{< katex >}}
+
 ## Math
 
 The loss for a linear regression model:

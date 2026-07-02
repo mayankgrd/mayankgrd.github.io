@@ -27,10 +27,11 @@ with Hugo Extended and deploys to https://mayankgrd.github.io/.
 ## Writing posts
 
 Posts live in `content/posts/<slug>/index.md` (page bundles, so images sit next
-to the post). Front-matter set `draft: false` to publish; add `math: true` for
-LaTeX. Supported in the body:
+to the post). Set `draft: false` in front-matter to publish. Supported in the
+body:
 
-- **Math:** `$inline$` and `$$display$$` (KaTeX)
+- **Math:** `$inline$` and `$$display$$` (KaTeX) — add a `{{< katex >}}`
+  shortcode near the top of any post that uses math, or it won't render
 - **Diagrams:** ```` ```mermaid ```` fenced blocks
 - **Code:** fenced blocks with syntax highlighting
 

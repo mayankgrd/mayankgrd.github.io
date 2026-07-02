@@ -14,11 +14,15 @@ Create a new article for the Hugo site.
 3. Run from the repo root:
    `hugo new posts/<slug>/index.md`
 4. Open the created file and set front-matter: real `title`, today's date,
-   `draft: false`, the provided `tags`, and `math: true` if the post will use
-   LaTeX.
-5. Tell the user the file path and remind them they can now write markdown,
-   including code fences, `$...$` / `$$...$$` math, and ```mermaid diagrams.
-6. Suggest running the `preview` skill to see it locally.
+   `draft: false`, and the provided `tags`.
+5. If the post will use LaTeX math, add the `{{< katex >}}` shortcode on its own
+   line near the top of the body (just after the intro). This is **required** —
+   Congo only loads KaTeX on pages that use this shortcode; `$...$` / `$$...$$`
+   alone will not render without it.
+6. Tell the user the file path and remind them they can now write markdown,
+   including code fences, `$...$` / `$$...$$` math (needs the katex shortcode
+   above), and ```mermaid diagrams (these work without any shortcode).
+7. Suggest running the `preview` skill to see it locally.
 
 ## Notes
 - Bundle format is `content/posts/<slug>/index.md` so images can sit alongside
