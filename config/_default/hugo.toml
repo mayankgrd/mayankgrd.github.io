@@ -1,0 +1,12 @@
+baseURL = "https://mayankgrd.github.io/"
+theme = "congo"
+defaultContentLanguage = "en"
+enableEmoji = true
+enableRobotsTXT = true
+
+[pagination]
+  pagerSize = 10
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"

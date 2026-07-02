@@ -1,0 +1,34 @@
+colorScheme = "congo"
+defaultAppearance = "light"
+autoSwitchAppearance = true
+
+enableSearch = true
+enableCodeCopy = true
+
+mainSections = ["posts"]
+robots = "index, follow"
+
+[header]
+  layout = "basic"
+
+[homepage]
+  layout = "profile"
+  showRecent = true
+  showRecentItems = 6
+  recentLimit = 6
+
+[article]
+  showDate = true
+  showAuthor = true
+  showReadingTime = true
+  showTableOfContents = true
+  showTaxonomies = true
+  showWordCount = false
+  math = true
+
+[list]
+  showTableOfContents = false
+
+# Enable KaTeX (math) and Mermaid (diagrams) loading
+[params.math]
+  enable = true
