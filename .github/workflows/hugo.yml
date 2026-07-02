@@ -39,7 +39,10 @@ jobs:
       - name: Build with Hugo
         env:
           HUGO_ENVIRONMENT: production
-        run: hugo --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
+        # Use the https baseURL from config, not the Pages action's base_url
+        # (that can be http:// and would cause mixed-content blocking on the
+        # https-served site, breaking CSS/JS loading).
+        run: hugo --minify
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
