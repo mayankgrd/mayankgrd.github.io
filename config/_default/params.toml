@@ -14,7 +14,6 @@ robots = "index, follow"
 [homepage]
   layout = "profile"
   showRecent = true
-  showRecentItems = 6
   recentLimit = 6
 
 [article]
@@ -28,7 +27,3 @@ robots = "index, follow"
 
 [list]
   showTableOfContents = false
-
-# Enable KaTeX (math) and Mermaid (diagrams) loading
-[params.math]
-  enable = true

@@ -5,3 +5,8 @@ title = "Coded thoughts"
 [params.author]
   name = "Mayank"
   headline = "Computer Vision and AI for healthcare"
+
+  [[params.author.links]]
+    linkedin = "https://www.linkedin.com/in/mayankgrd/"
+  [[params.author.links]]
+    github = "https://github.com/mayankgrd"
