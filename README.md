@@ -31,7 +31,9 @@ to the post). Set `draft: false` in front-matter to publish. Supported in the
 body:
 
 - **Math:** `$inline$` and `$$display$$` (KaTeX) — add a `{{< katex >}}`
-  shortcode near the top of any post that uses math, or it won't render
+  shortcode near the top of any post that uses math, or it won't render.
+  (Single-`$` inline is enabled via `layouts/_partials/extend-footer.html`;
+  escape a literal dollar sign in text as `\$`.)
 - **Diagrams:** wrap Mermaid in the `{{< mermaid >}}` … `{{< /mermaid >}}`
   shortcode (a plain ```` ```mermaid ```` fence renders as raw text)
 - **Code:** fenced blocks with syntax highlighting

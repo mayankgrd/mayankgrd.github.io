@@ -1,0 +1,24 @@
+{{/*
+  Enable single-dollar inline math: $ ... $
+
+  Congo's KaTeX auto-render (themes/congo/layouts/_partials/vendor.html) only
+  wires up $$...$$, \[...\] (display) and \(...\) (inline) — single $ is left
+  out because it clashes with currency ("$5"). We add it back here so plain
+  Markdown inline math works. Runs on window load, after Congo's own
+  renderMathInElement onload handler has defined the function, and only on
+  pages that loaded KaTeX (i.e. that use the {{< katex >}} shortcode).
+
+  To write a literal dollar sign in body text on such a page, escape it: \$
+*/}}
+{{ if .Page.HasShortcode "katex" }}
+<script>
+  window.addEventListener("load", function () {
+    if (typeof renderMathInElement === "function") {
+      renderMathInElement(document.body, {
+        delimiters: [{ left: "$", right: "$", display: false }],
+        throwOnError: false,
+      });
+    }
+  });
+</script>
+{{ end }}

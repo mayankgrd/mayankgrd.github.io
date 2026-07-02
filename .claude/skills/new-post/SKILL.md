@@ -20,8 +20,9 @@ Create a new article for the Hugo site.
    Congo only loads KaTeX on pages that use this shortcode; `$...$` / `$$...$$`
    alone will not render without it.
 6. Tell the user the file path and remind them they can now write markdown,
-   including code fences and `$...$` / `$$...$$` math (needs the katex shortcode
-   from step 5).
+   including code fences and math (needs the katex shortcode from step 5):
+   inline `$e^{i\pi}=-1$` and display `$$ ... $$`. To show a literal dollar
+   sign in text on a math page, escape it as `\$`.
 7. Suggest running the `preview` skill to see it locally.
 
 ## Notes
